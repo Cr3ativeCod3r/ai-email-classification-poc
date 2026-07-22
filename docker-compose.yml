@@ -11,6 +11,8 @@ services:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
       - LLM_MODEL=${LLM_MODEL:-llama3.2}
       - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL:-http://notification-service:8000/internal/v1/emails}
+    volumes:
+      - ./departments.json:/app/departments.json:ro
     depends_on:
       init-ollama:
         condition: service_completed_successfully

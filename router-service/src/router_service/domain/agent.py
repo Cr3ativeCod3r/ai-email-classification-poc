@@ -31,15 +31,24 @@ For the subject, generate a brief and descriptive subject based on the message.
 For the body, you can pass the original message or a slightly formatted version of it.
 """
 
-ollama_model = OllamaModel(
-    model_name=settings.llm_model,
-    base_url=settings.ollama_base_url
-)
+ollama_url = settings.ollama_base_url
+if not ollama_url.endswith("/v1"):
+    ollama_url = f"{ollama_url.rstrip('/')}/v1"
+
+try:
+    from pydantic_ai.providers.openai import OpenAIProvider
+    provider = OpenAIProvider(base_url=ollama_url, api_key="ollama")
+    ollama_model = OllamaModel(
+        model_name=settings.llm_model,
+        provider=provider
+    )
+except ImportError:
+    ollama_model = OllamaModel(model_name=settings.llm_model)
 
 router_agent = Agent[RouterDependencies, AgentResponse](
     model=ollama_model,
     system_prompt=system_prompt,
-    result_type=AgentResponse,
+    output_type=AgentResponse,
 )
 
 @router_agent.tool

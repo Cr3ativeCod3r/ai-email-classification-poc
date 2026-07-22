@@ -25,8 +25,8 @@ async def process_message(
     try:
         result = await router_agent.run(request.message, deps=deps)
         return MessageResponse(
-            routed_to=result.data.target.value,
-            reasoning_summary=result.data.reasoning,
+            routed_to=result.output.target.value,
+            reasoning_summary=result.output.reasoning,
             status="sent"
         )
     except Exception as e:

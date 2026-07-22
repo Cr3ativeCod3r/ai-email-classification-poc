@@ -48,6 +48,7 @@ except ImportError:
 router_agent = Agent[RouterDependencies, AgentResponse](
     model=ollama_model,
     system_prompt=system_prompt,
+    deps_type=RouterDependencies,
     output_type=AgentResponse,
 )
 

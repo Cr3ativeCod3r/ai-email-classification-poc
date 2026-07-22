@@ -3,7 +3,6 @@ from pydantic_ai import models
 from pydantic_ai.models.test import TestModel
 from router_service.domain.agent import router_agent, RouterDependencies
 from router_service.domain.ports import NotificationPort, EmailCommand
-from router_service.domain.routing import RoutingTarget
 
 class MockNotificationAdapter(NotificationPort):
     def __init__(self):
@@ -15,8 +14,10 @@ class MockNotificationAdapter(NotificationPort):
 
 @pytest.mark.asyncio
 async def test_routing_agent_success():
-    # Use TestModel instead of the real LLM for unit tests
-    test_model = TestModel()
+    test_model = TestModel(
+        call_tools=[],
+        custom_output_args={"target": "it@example.com", "reasoning": "something"}
+    )
     
     mock_adapter = MockNotificationAdapter()
     deps = RouterDependencies(
@@ -30,7 +31,7 @@ async def test_routing_agent_success():
         # TestModel will just return default values or empty strings for strings, and the first enum for enums.
         # But we can check that it didn't crash.
         assert result.output is not None
-        assert isinstance(result.output.target, RoutingTarget)
+        assert isinstance(result.output.target, str)
 
 @pytest.mark.asyncio
 async def test_tool_execution():

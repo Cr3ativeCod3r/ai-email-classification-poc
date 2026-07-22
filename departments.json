@@ -1,0 +1,27 @@
+[
+  {
+    "shortcut": "HR",
+    "email": "human-resources@example.com",
+    "description": "for HR related queries"
+  },
+  {
+    "shortcut": "HELP_DESK",
+    "email": "help-desk@example.com",
+    "description": "for general help or customer service"
+  },
+  {
+    "shortcut": "IT",
+    "email": "it@example.com",
+    "description": "for technical issues, broken equipment, IT support"
+  },
+  {
+    "shortcut": "KADRY",
+    "email": "kadry@example.com",
+    "description": "Polish equivalent of HR, matters related to payroll, holidays"
+  },
+  {
+    "shortcut": "OTHER",
+    "email": "other@example.com",
+    "description": "fallback for anything else, or if you are unsure"
+  }
+]

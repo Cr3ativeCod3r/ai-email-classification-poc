@@ -1,13 +1,25 @@
-from enum import Enum
+import json
+from pathlib import Path
 from pydantic import BaseModel, Field
 
-class RoutingTarget(str, Enum):
-    HUMAN_RESOURCES = "human-resources@example.com"
-    HELP_DESK = "help-desk@example.com"
-    IT = "it@example.com"
-    KADRY = "kadry@example.com"
-    OTHER = "other@example.com"
+import os
+
+# Go up 5 levels: domain -> router_service -> src -> router-service -> root
+DEFAULT_PATH = Path(__file__).resolve().parent.parent.parent.parent.parent / "departments.json"
+DEPARTMENTS_FILE = Path(os.environ.get("DEPARTMENTS_FILE", DEFAULT_PATH))
+
+with open(DEPARTMENTS_FILE, "r", encoding="utf-8") as f:
+    DEPARTMENTS_DATA = json.load(f)
+
+def get_fallback_email() -> str:
+    for d in DEPARTMENTS_DATA:
+        if d["shortcut"] == "OTHER":
+            return d["email"]
+    return "other@example.com"
 
 class AgentResponse(BaseModel):
-    target: RoutingTarget = Field(description="The chosen department to route the message to.")
-    reasoning: str = Field(description="Short summary explaining why this department was chosen.")
+    target: str = Field(
+        description="The target department email to route the message to.",
+        json_schema_extra={"enum": [d["email"] for d in DEPARTMENTS_DATA]}
+    )
+    reasoning: str = Field(description="A brief explanation of why this department was selected.")

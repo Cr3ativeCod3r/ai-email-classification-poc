@@ -1,6 +1,6 @@
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.ollama import OllamaModel
-from router_service.domain.routing import RoutingTarget, AgentResponse
+from router_service.domain.routing import AgentResponse, DEPARTMENTS_DATA
 from router_service.domain.ports import NotificationPort, EmailCommand
 from router_service.config import settings
 from dataclasses import dataclass
@@ -13,16 +13,16 @@ class RouterDependencies:
     notification_adapter: NotificationPort
     user_email: str
 
-system_prompt = """
+departments_list_str = "\n".join(
+    f"- {d['email']} ({d['description']})" for d in DEPARTMENTS_DATA
+)
+
+system_prompt = f"""
 You are an intelligent message router. Your job is to analyze incoming messages from users
 and route them to the appropriate department.
 
 Available departments:
-- human-resources@example.com (for HR related queries)
-- help-desk@example.com (for general help or customer service)
-- it@example.com (for technical issues, broken equipment, IT support)
-- kadry@example.com (Polish equivalent of HR, matters related to payroll, holidays)
-- other@example.com (fallback for anything else, or if you are unsure)
+{departments_list_str}
 
 You must ALWAYS use the `send_email_tool` to dispatch the message to the chosen department.
 For the target_email, use exactly one of the allowed routing targets.
@@ -53,16 +53,16 @@ router_agent = Agent[RouterDependencies, AgentResponse](
 )
 
 @router_agent.tool
-async def send_email_tool(ctx: RunContext[RouterDependencies], target_email: RoutingTarget, subject: str, body: str) -> str:
+async def send_email_tool(ctx: RunContext[RouterDependencies], target_email: str, subject: str, body: str) -> str:
     """Sends an email to the selected department with the user's message."""
     command = EmailCommand(
-        target_email=target_email.value,
+        target_email=target_email,
         subject=subject,
         body=body,
         reply_to=ctx.deps.user_email
     )
     success = await ctx.deps.notification_adapter.send_email(command)
     if success:
-        return f"Email successfully sent to {target_email.value}"
+        return f"Email successfully sent to {target_email}"
     else:
-        return f"Failed to send email to {target_email.value}"
+        return f"Failed to send email to {target_email}"

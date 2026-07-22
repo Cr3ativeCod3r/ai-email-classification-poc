@@ -25,17 +25,17 @@ async def process_message(
     try:
         result = await router_agent.run(request.message, deps=deps)
         return MessageResponse(
-            routed_to=result.output.target.value,
+            routed_to=result.output.target,
             reasoning_summary=result.output.reasoning,
             status="sent"
         )
     except Exception as e:
         logger.error(f"Agent failed to process message: {e}")
         # Fallback handling in case LLM fails or doesn't follow schema perfectly
-        from router_service.domain.routing import RoutingTarget
+        from router_service.domain.routing import get_fallback_email
         from router_service.domain.ports import EmailCommand
         
-        fallback_target = RoutingTarget.OTHER.value
+        fallback_target = get_fallback_email()
         command = EmailCommand(
             target_email=fallback_target,
             subject="Fallback Subject",

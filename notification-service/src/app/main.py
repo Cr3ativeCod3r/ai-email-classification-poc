@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from notification_service.api.routers import router
+from app.controllers.routers import router
 import logging
 
 logging.basicConfig(level=logging.INFO)

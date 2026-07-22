@@ -1,7 +1,7 @@
 import aiosmtplib
 from email.message import EmailMessage
-from notification_service.domain.ports import EmailSenderPort, EmailCommand
-from notification_service.config import settings
+from app.models.ports import EmailSenderPort, EmailCommand
+from app.config import settings
 import logging
 
 logger = logging.getLogger(__name__)

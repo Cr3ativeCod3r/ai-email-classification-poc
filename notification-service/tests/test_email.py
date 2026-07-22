@@ -1,6 +1,6 @@
 import pytest
-from notification_service.domain.ports import EmailCommand
-from notification_service.infrastructure.smtp_adapter import SMTPEmailAdapter
+from app.models.ports import EmailCommand
+from app.repositories.smtp_adapter import SMTPEmailAdapter
 
 class MockSMTPSender:
     def __init__(self):

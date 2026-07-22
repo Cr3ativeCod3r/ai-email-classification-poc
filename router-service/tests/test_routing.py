@@ -1,8 +1,8 @@
 import pytest
 from pydantic_ai import models
 from pydantic_ai.models.test import TestModel
-from router_service.domain.agent import router_agent, RouterDependencies
-from router_service.domain.ports import NotificationPort, EmailCommand
+from app.services.agent import router_agent, RouterDependencies
+from app.models.ports import NotificationPort, EmailCommand
 
 class MockNotificationAdapter(NotificationPort):
     def __init__(self):

@@ -1,6 +1,6 @@
 import httpx
-from router_service.domain.ports import NotificationPort, EmailCommand
-from router_service.config import settings
+from app.models.ports import NotificationPort, EmailCommand
+from app.config import settings
 import logging
 
 logger = logging.getLogger(__name__)

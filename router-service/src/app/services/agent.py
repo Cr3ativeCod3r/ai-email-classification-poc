@@ -1,8 +1,9 @@
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.ollama import OllamaModel
-from router_service.domain.routing import AgentResponse, DEPARTMENTS_DATA
-from router_service.domain.ports import NotificationPort, EmailCommand
-from router_service.config import settings
+from app.models.schemas import AgentResponse
+from app.repositories.department_repository import DEPARTMENTS_DATA
+from app.models.ports import NotificationPort, EmailCommand
+from app.config import settings
 from dataclasses import dataclass
 import logging
 

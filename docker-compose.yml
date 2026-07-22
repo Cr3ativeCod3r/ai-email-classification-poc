@@ -1,0 +1,73 @@
+services:
+  router-service:
+    build:
+      context: ./router-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - LLM_MODEL=${LLM_MODEL}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL}
+    depends_on:
+      init-ollama:
+        condition: service_completed_successfully
+      notification-service:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+    depends_on:
+      mailhog:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  init-ollama:
+    image: ollama/ollama:latest
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    command: pull ${LLM_MODEL}
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8025/api/v2/messages"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama-data:

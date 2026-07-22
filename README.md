@@ -10,6 +10,28 @@ The project is split into the following microservices:
 - **ollama**: Runs the LLM engine and automatically downloads the model upon startup using an initialization service (`init-ollama`).
 - **mailhog**: SMTP server and UI to intercept and display sent emails.
 
+## Code Architecture
+
+Both microservices (`router-service` and `notification-service`) strictly follow the **Layered Architecture** pattern. 
+The internal structure of the `src/app` directory looks like this:
+
+```text
+app/
+├── controllers/
+├── services/
+├── models/
+└── repositories/
+```
+
+### Why we chose this architecture:
+- **Separation of Concerns**: Each layer has a single, well-defined responsibility. 
+  - `controllers/` handle incoming HTTP requests and API routing (FastAPI).
+  - `services/` orchestrate the core business logic, including interactions with the AI agent and fallback mechanisms.
+  - `models/` contain data structures, DTOs (Pydantic schemas), and interfaces (Ports).
+  - `repositories/` handle all external I/O operations (reading files, calling external APIs, SMTP communication).
+- **Fast Iteration**: It is a highly intuitive, standard, and lightweight pattern in the Python ecosystem. This reduces boilerplate code compared to strict Hexagonal Architecture, making it perfect for Proof of Concept (PoC) projects and microservices.
+- **Maintainability & Testability**: By keeping controllers free of business logic and segregating external dependencies to repositories, the core services can be easily tested via mocking.
+
 ## Prerequisites
 
 - Docker and Docker Compose (Compose v2)

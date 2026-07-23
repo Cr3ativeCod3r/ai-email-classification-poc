@@ -1,0 +1,24 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "router-service",
+      "extraPaths": [
+        "router-service/src",
+        "router-service/.venv/lib/python3.13/site-packages"
+      ]
+    },
+    {
+      "root": "notification-service",
+      "extraPaths": [
+        "notification-service/src",
+        "notification-service/.venv/lib/python3.13/site-packages"
+      ]
+    }
+  ],
+  "include": [
+    "router-service/src",
+    "router-service/tests",
+    "notification-service/src",
+    "notification-service/tests"
+  ]
+}

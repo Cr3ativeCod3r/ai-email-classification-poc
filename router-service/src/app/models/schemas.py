@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr
-
+from pydantic import BaseModel, EmailStr, Field
+from app.repositories.department_repository import DEPARTMENTS_DATA
 class MessageRequest(BaseModel):
     email: EmailStr
     message: str
@@ -8,9 +8,6 @@ class MessageResponse(BaseModel):
     routed_to: str
     reasoning_summary: str
     status: str
-
-from pydantic import Field
-from app.repositories.department_repository import DEPARTMENTS_DATA
 
 class AgentResponse(BaseModel):
     target: str = Field(

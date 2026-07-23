@@ -1,5 +1,4 @@
 import pytest
-from pydantic_ai import models
 from pydantic_ai.models.test import TestModel
 from app.services.agent import router_agent, RouterDependencies
 from app.models.ports import NotificationPort, EmailCommand
@@ -33,13 +32,3 @@ async def test_routing_agent_success():
         assert result.output is not None
         assert isinstance(result.output.target, str)
 
-@pytest.mark.asyncio
-async def test_tool_execution():
-    mock_adapter = MockNotificationAdapter()
-    deps = RouterDependencies(
-        notification_adapter=mock_adapter,
-        user_email="test@user.com"
-    )
-    
-    # We can invoke the tool directly if we create a mock context, 
-    # but testing the agent run is usually enough for pydantic_ai.

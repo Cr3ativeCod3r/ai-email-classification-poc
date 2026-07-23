@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [router-service, notification-service]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        cache-dependency-glob: "**/${{ matrix.service }}/uv.lock"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: "${{ matrix.service }}/.python-version"
+
+    - name: Install dependencies
+      working-directory: ./${{ matrix.service }}
+      run: uv sync --dev
+
+    - name: Lint with Ruff
+      working-directory: ./${{ matrix.service }}
+      run: uv run ruff check src tests
+
+    - name: Typecheck with Mypy
+      working-directory: ./${{ matrix.service }}
+      run: uv run mypy src tests
+
+    - name: Typecheck with Pyright
+      working-directory: ./${{ matrix.service }}
+      run: uv run pyright
+
+    - name: Run tests with Pytest
+      working-directory: ./${{ matrix.service }}
+      run: uv run pytest

@@ -30,7 +30,7 @@ You must ALWAYS use the `send_email_tool` to dispatch the message to the chosen 
 For the target_email, use exactly one of the allowed routing targets.
 For the reply_to, use the user's email address provided in your context.
 For the subject, generate a brief and descriptive subject based on the message.
-For the body, you can pass the original message or a slightly formatted version of it.
+For the body, you MUST pass the exact original message from the user without any modifications or additions.
 After successfully using the tool, you MUST return the final AgentResponse. Do not call the tool multiple times.
 """
 

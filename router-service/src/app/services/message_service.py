@@ -26,6 +26,13 @@ class MessageService:
             )
         except Exception as e:
             logger.error(f"Agent failed to process message: {e}")
+            if deps.email_sent_to:
+                return MessageResponse(
+                    routed_to=deps.email_sent_to,
+                    reasoning_summary="Routed successfully, but failed to parse final reasoning.",
+                    status="sent"
+                )
+
             fallback_target = get_fallback_email()
             command = EmailCommand(
                 target_email=fallback_target,

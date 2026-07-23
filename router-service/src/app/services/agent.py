@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class RouterDependencies:
     notification_adapter: NotificationPort
     user_email: str
+    email_sent_to: str | None = None
 
 departments_list_str = "\n".join(
     f"- {d['email']} ({d['description']})" for d in DEPARTMENTS_DATA
@@ -30,6 +31,7 @@ For the target_email, use exactly one of the allowed routing targets.
 For the reply_to, use the user's email address provided in your context.
 For the subject, generate a brief and descriptive subject based on the message.
 For the body, you can pass the original message or a slightly formatted version of it.
+After successfully using the tool, you MUST return the final AgentResponse. Do not call the tool multiple times.
 """
 
 ollama_url = settings.ollama_base_url
@@ -56,6 +58,9 @@ router_agent = Agent[RouterDependencies, AgentResponse](
 @router_agent.tool
 async def send_email_tool(ctx: RunContext[RouterDependencies], target_email: str, subject: str, body: str) -> str:
     """Sends an email to the selected department with the user's message."""
+    if ctx.deps.email_sent_to is not None:
+        return f"Email was already sent to {ctx.deps.email_sent_to}. Do not call this tool again. Please yield the final AgentResponse."
+
     command = EmailCommand(
         target_email=target_email,
         subject=subject,
@@ -64,6 +69,7 @@ async def send_email_tool(ctx: RunContext[RouterDependencies], target_email: str
     )
     success = await ctx.deps.notification_adapter.send_email(command)
     if success:
-        return f"Email successfully sent to {target_email}"
+        ctx.deps.email_sent_to = target_email
+        return f"Email successfully sent to {target_email}. Please yield the final AgentResponse."
     else:
-        return f"Failed to send email to {target_email}"
+        return f"Failed to send email to {target_email}."

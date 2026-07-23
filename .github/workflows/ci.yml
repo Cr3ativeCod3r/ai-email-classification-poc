@@ -36,10 +36,6 @@ jobs:
       working-directory: ./${{ matrix.service }}
       run: uv run ruff check src tests
 
-    - name: Typecheck with Mypy
-      working-directory: ./${{ matrix.service }}
-      run: uv run mypy src tests
-
     - name: Typecheck with Pyright
       working-directory: ./${{ matrix.service }}
       run: uv run pyright
